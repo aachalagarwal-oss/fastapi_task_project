@@ -58,3 +58,6 @@ KEY LEARNINGS:
 2. I learned about simple jwt beearer authentication as of while I was using OAuth2.
 3. I leanred difference the authentication steps better.
 4. I understood more about alembic.
+
+
+
