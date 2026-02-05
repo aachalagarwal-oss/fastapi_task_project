@@ -17,24 +17,19 @@ Get User specific Tasks (Protected routes)
 API flow explanation:
 Program strats from main:
 A. User Registration / Login
-
 1.User sends request to /auth/register or /auth/login
-
 2.Router calls service layer---
 checks if user exists in DB
 hashes password using passlib
 saves user to database 
-
 3.During login:
 password is verified
 JWT access token is generated
-
 4.Token is returned to the user
 
 
 B. Authentication 
 1.User sends request with Authorization: Bearer <token>
-
 2.FastAPI dependency get_current_user runs before endpoint
 and extrats token decode it and fetches user from database
 
@@ -47,7 +42,7 @@ C.Task creation/updation/deletion/getall
 4.then it goes back to the endpoint and it returns accordingly.
 
 
-5. Migrations
+D. Migrations
 
 1.Models define structure
 2.Alembic converts models → database tables
