@@ -1,23 +1,26 @@
 # Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
 
-# Virtual env
+# Virtual Environment
 venv/
-.env/
+.venv/
 
-# VS Code
-.vscode/
+# Environment variables (CRITICAL)
+.env
+.env.*
+!.env.example
 
 # Database
 *.db
 *.sqlite3
 
-# Alembic cache
-alembic/versions/*.pyc
+# Logs
+*.log
+
+# VS Code
+.vscode/
 
 # OS
 .DS_Store
-Thumbs.db
