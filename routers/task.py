@@ -8,10 +8,10 @@ from dependencies import db
 import schemas
 import models
 from schemas.task import TaskResponse
-from services.task_service import create_task,get_task,get_task_by_id,update_task,delete_task
+# from services.task_service import TaskService, create_task,get_task,get_task_by_id,update_task,delete_task
 from sqlalchemy.orm import Session
 from typing import Optional,List
-
+from services.task_service import TaskService
 
 
 router=APIRouter(
@@ -32,9 +32,8 @@ async def create_tasks(
     db: Session = Depends(get_db)
 ):
     try:
-       
-        return create_task(
-            db=db,
+        service=TaskService(db)
+        return service.create_task(
             title=request.title,
             description=request.description,
             status=request.status,
@@ -51,7 +50,8 @@ async def create_tasks(
 @router.get('/', response_model=List[TaskResponse])
 async def get_tasks(user:user_dependency,db:Session=Depends(get_db),offset: int = 1, limit: int = 10):
     try:
-        return get_task(db=db, user_id=user.id, limit=limit, offset=offset)
+        service=TaskService(db)
+        return service.get_task(user_id=user.id, limit=limit, offset=offset)
     
 
     except HTTPException:
@@ -66,7 +66,8 @@ async def get_tasks(user:user_dependency,db:Session=Depends(get_db),offset: int 
 @router.get('/{id}')
 async def get_tasks(id:int,user:user_dependency,db:Session=Depends(get_db)):
     try:
-        my_tasks=get_task_by_id(db=db,id=id,user_id=user.id)
+        service=TaskService(db)
+        my_tasks=service.get_task_by_id(user_id=user.id,id=id)
         return my_tasks
     
 
@@ -86,7 +87,8 @@ async def get_tasks(id:int,user:user_dependency,db:Session=Depends(get_db)):
 @router.put('/{id}')
 async def update(id:int,user:user_dependency,request:schemas.task.create_tasks,db:Session=Depends(get_db)):
     try:
-        return update_task(db=db,id=id,user_id=user.id,title=request.title,description=request.description,status=request.status)
+        service=TaskService(db)
+        return service.update_task(id=id,user_id=user.id,title=request.title,description=request.description,status=request.status)
     except HTTPException:
         raise
     except Exception:
@@ -102,7 +104,8 @@ async def update(id:int,user:user_dependency,request:schemas.task.create_tasks,d
 @router.delete('/{id}')
 async def delete(id:int,user:user_dependency,db:Session=Depends(get_db)):
     try:
-        return delete_task(db=db,id=id,user_id=user.id)
+        service=TaskService(db)
+        return service.delete_task(user_id=user.id,id=id)
     except HTTPException:
         raise
     except Exception:

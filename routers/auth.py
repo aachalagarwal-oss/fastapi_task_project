@@ -1,15 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from schemas.user import UserCreate, UserLogin, UserResponse
-from services.user_service import create_user, authenticate_user
 from dependencies.db import get_db
-
+from services.user_service import UserService
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 def register_user(request: UserCreate, db: Session = Depends(get_db)):
     try:
-        return create_user(db, request.email, request.password)
+        service=UserService(db)
+        return service.create_user(request.email, request.password)
     except HTTPException:
         raise
     except Exception:
@@ -17,7 +17,8 @@ def register_user(request: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login_user(request: UserLogin, db: Session = Depends(get_db)):
-    token = authenticate_user(db, request.email, request.password)
+    service=UserService(db)
+    token = service.authenticate_user(request.email, request.password)
     if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

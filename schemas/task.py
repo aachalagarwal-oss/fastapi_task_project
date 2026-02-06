@@ -15,3 +15,4 @@ class TaskResponse(BaseModel):
     title:str
     description:str
     status:str
+
