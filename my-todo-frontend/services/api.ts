@@ -1,3 +1,5 @@
+import { error } from "console";
+
 const BASE_URL="http://localhost:8000";
 
 
@@ -72,4 +74,29 @@ export const gettask=async()=>{
     catch(error){
         throw error;
     }
+}
+
+
+export const updatetask=async(id:number,status:string)=>{
+    const token=localStorage.getItem("token")
+    try{
+         const res=await fetch(`${BASE_URL}/tasks/${id}`,{
+        method:"PUT",
+        headers:{
+            "Content-Type":"application/json",
+            Authorization:`Bearer ${token}`
+        },
+        body:JSON.stringify({
+            status:status
+        })
+    })
+    const data=await res.json();
+    if(!res.ok){
+        throw new Error(data.detail || "Can't update your task")
+    }
+    }
+    catch(error){
+        throw error
+    }
+   
 }

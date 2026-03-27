@@ -30,7 +30,7 @@ export default function Tasks() {
   return (
     <div className=" w-100 center flex flex-col border-4 p-4 m-auto ">
       <div className="p-2">
-        <h3> Todo Manager</h3> 
+        <h3 className="text-3xl font-bold text-center mb-6"> Todo Manager</h3> 
       </div>
       <div>
         <Inputfields labeltext="Title" inputtext="Enter your title" value={title} onInputChange={setTitle}/>

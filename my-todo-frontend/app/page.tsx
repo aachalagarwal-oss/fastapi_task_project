@@ -15,7 +15,6 @@ export default function Home() {
     mutationFn:({email,password}:{email:string,password:string})=>{
       return loginUser(email,password)
     },
-
     onSuccess:(data)=>{
         localStorage.setItem("token",data.access_token)
          alert("Login successful ");
