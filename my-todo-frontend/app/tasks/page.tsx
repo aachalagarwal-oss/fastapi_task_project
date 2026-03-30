@@ -37,7 +37,7 @@ export default function Tasks() {
         <Inputfields labeltext="Description" inputtext="Enter the description" value={desc} onInputChange={setDesc}/>
         <button onClick={handleClick}  className="border-3  bg-blue-600 ">+ Add Todo</button>
       </div>
-     <Taskbox/>
+     <Taskbox setTitleChanged={setTitle} setDescChanged={setDesc}/>
     </div>
   );
 }

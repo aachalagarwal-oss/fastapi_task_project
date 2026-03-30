@@ -1,6 +1,8 @@
-import { gettask, updatetask } from "@/services/api";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { deletetask, gettask, updateanytask, updatetask } from "@/services/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { title } from "process";
 import { useState } from "react";
+import Inputfields from "./inputfields";
 type Task = {
   title: string;
   description: string;
@@ -8,8 +10,15 @@ type Task = {
   created_at: string;
   status: string;
 };
-export default function Taskbox() {
- 
+export default function Taskbox({
+  setTitleChanged,
+  setDescChanged,
+}: {
+  setTitleChanged: (title: string) => void;
+  setDescChanged: (desc: string) => void;
+}) {
+  const queryClient = useQueryClient();
+  const [isbuttontrue,showButton]=useState(false)
   const { data, isLoading, isError } = useQuery<Task[]>({
     queryKey: ["tasks"],
     queryFn: () => gettask(),
@@ -18,24 +27,60 @@ export default function Taskbox() {
     mutationFn: ({ id, status }: { id: number; status: string }) => {
       return updatetask(id, status);
     },
+    onSuccess: () => {
+      alert("Updated");
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
     onError: (error: any) => {
       alert(error.message || "Task couldn't be completed");
     },
   });
-  const [completedTask, setcompletedTask] = useState<number[]>([]);
-  function handleClick( id: number) {
-    const isCompleted=completedTask.includes(id)
-    const newStatus=isCompleted?"completed":"pending"
-      
-    if (completedTask.includes(index)) {
-      setcompletedTask(completedTask.filter((i) => i !== index));
-    } else {
-      setcompletedTask([...completedTask, index]);
-      
-    }
-    mutate.mutate({ id, status :newStatus});
 
-      
+  const updatemutate = useMutation({
+    mutationFn: ({
+      id,
+      title,
+      description,
+    }: {
+      id: number;
+      title: string;
+      description: string;
+    }) => {
+      return updateanytask(id, title, description);
+    },
+    onSuccess: () => {
+      alert("Task updated");
+    },
+  });
+  const deletemutate = useMutation({
+    mutationFn: (id: number) => {
+      return deletetask(id);
+    },
+    onSuccess: () => {
+      alert(`Task deleted`);
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+
+  function handleUpdateTask(id: number, title: string, description: string) {
+    {
+      setTitleChanged(title);
+      setDescChanged(description);
+    }
+    showButton(true);
+   
+  }
+  function handleClick(id: number, status: string) {
+    mutate.mutate({
+      id,
+      status: status == "completed" ? "pending" : "completed",
+    });
+  }
+  function UpdateTask(){
+     updatemutate.mutate({id,title,description})
+  }
+  function handleDeleteTask(id: number) {
+    deletemutate.mutate(id);
   }
 
   if (isLoading) return <div>Loading...</div>;
@@ -44,33 +89,56 @@ export default function Taskbox() {
     <>
       {data?.map((task, index) => {
         const date = new Date(task.created_at);
-        const isCompleted = completedTask.includes(index);
         return (
-          <div className="bg-white shadow-md rounded-xl p-5 border hover:shadow-lg transition duration-200" key={index}>
+          <div
+            className="shadow-md rounded-xl p-5 border hover:shadow-lg transition duration-200"
+            key={index}
+          >
             <div className="border-4 p-4 m-auto gap-6">
-              <div className={`text-xl font-semibold ${isCompleted ? "line-through text-gray-400" : "text-black"}`}>
+              <div
+                className={`text-white text-xl font-semibold ${task.status == "completed" ? "line-through text-gray-400" : "text-black"}`}
+              >
                 {task.title}
               </div>
 
               <div className="flex justify-between items-center">
                 <span
-                  className={`text-xl font-semibold ${isCompleted ? "line-through text-gray-400" : "text-black"}`}
+                  className={`text-white  text-xl font-semibold ${task.status == "completed" ? "line-through text-gray-400" : "text-black"}`}
                 >
                   {task.description}
                 </span>
 
                 <button
-                  onClick={() => handleClick(index, task.id, task.status)}
-                  className=" text-black px-3 py-1 rounded"
+                  onClick={() => handleClick(task.id, task.status)}
+                  className=" text-white px-3 py-1 rounded"
                 >
                   ☑
                 </button>
+
+                {isbuttontrue && <button onClick={()=>{UpdateTask}}>Update</button>}
               </div>
 
-              <div className={`text-xl font-semibold ${isCompleted ? "line-through text-gray-400" : "text-black"}`}>
+              <div
+                className={`text-white  text-xl font-semibold ${task.status == "completed" ? "line-through text-gray-400" : "text-black"}`}
+              >
                 Created at : {date.toLocaleDateString()} on{" "}
                 {date.toLocaleTimeString()}
               </div>
+
+              <button
+                onClick={() =>
+                  handleUpdateTask(task.id, task.title, task.description)
+                }
+                className=" text-white px-3 py-1 rounded"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDeleteTask(task.id)}
+                className=" text-white px-3 py-1 rounded"
+              >
+                Delete
+              </button>
             </div>
           </div>
         );

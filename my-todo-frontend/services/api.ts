@@ -100,3 +100,51 @@ export const updatetask=async(id:number,status:string)=>{
     }
    
 }
+
+
+export const updateanytask=async(id:number,title:string,description:string)=>{
+    const token=localStorage.getItem("token")
+    try{
+         const res=await fetch(`${BASE_URL}/tasks/${id}`,{
+        method:"PUT",
+        headers:{
+            "Content-Type":"application/json",
+            Authorization:`Bearer ${token}`
+        },
+        body:JSON.stringify({
+            title:title,
+            description:description
+        })
+    })
+    const data=await res.json();
+    if(!res.ok){
+        throw new Error(data.detail || "Can't update your task")
+    }
+    }
+    catch(error){
+        throw error
+    }
+   
+}
+
+
+export const deletetask=async(id:number)=>{
+    const token=localStorage.getItem("token")
+    try{
+        const res=await fetch(`${BASE_URL}/tasks/${id}`,{
+            method:"DELETE",
+            headers:{
+                "Content-type":"application/json",
+                Authorization:`Bearer ${token}`
+            },
+
+        })
+        const data=await res.json()
+        if(!res.ok){
+            throw new Error(data.detail || "Can't update your task")
+        }
+    }
+    catch(error){
+        throw error
+    }
+}

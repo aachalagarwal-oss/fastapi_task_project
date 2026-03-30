@@ -1,6 +1,6 @@
 type texttypes = {
-  labeltext: string;
-  inputtext: string;
+  labeltext?: string;
+  inputtext?: string;
   value?: string;
   onInputChange?: (value: string) => void;
   type?: string;
