@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from models.task import Task
 import models
+from schemas.task import UpdateTask
 
 
 class TaskService:
@@ -39,7 +40,7 @@ class TaskService:
         return my_tasks
         
 
-    def update_task(self,id:int, title: str, description: str, status: str, user_id: int):
+    def update_task(self,id:int, user_id: int,request:UpdateTask):
         
         task = self.db.query(Task).filter(
             Task.id == id,
@@ -53,9 +54,11 @@ class TaskService:
             )
 
 
-        task.title = title
-        task.description = description
-        task.status = status
+        update_data=request.dict(exclude_unset=True)
+
+        for key,value in update_data.items():
+            setattr(task,key,value)
+
 
         self.db.commit()
         self.db.refresh(task)

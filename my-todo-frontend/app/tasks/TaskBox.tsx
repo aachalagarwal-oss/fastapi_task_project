@@ -1,8 +1,7 @@
 import { deletetask, gettask, updateanytask, updatetask } from "@/services/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { title } from "process";
 import { useState } from "react";
-import Inputfields from "./inputfields";
+
 type Task = {
   title: string;
   description: string;
@@ -13,12 +12,13 @@ type Task = {
 export default function Taskbox({
   setTitleChanged,
   setDescChanged,
+  setId
 }: {
   setTitleChanged: (title: string) => void;
   setDescChanged: (desc: string) => void;
+  setId:(id:number)=>void;
 }) {
   const queryClient = useQueryClient();
-  const [isbuttontrue,showButton]=useState(false)
   const { data, isLoading, isError } = useQuery<Task[]>({
     queryKey: ["tasks"],
     queryFn: () => gettask(),
@@ -36,22 +36,7 @@ export default function Taskbox({
     },
   });
 
-  const updatemutate = useMutation({
-    mutationFn: ({
-      id,
-      title,
-      description,
-    }: {
-      id: number;
-      title: string;
-      description: string;
-    }) => {
-      return updateanytask(id, title, description);
-    },
-    onSuccess: () => {
-      alert("Task updated");
-    },
-  });
+
   const deletemutate = useMutation({
     mutationFn: (id: number) => {
       return deletetask(id);
@@ -66,8 +51,8 @@ export default function Taskbox({
     {
       setTitleChanged(title);
       setDescChanged(description);
+      setId(id);
     }
-    showButton(true);
    
   }
   function handleClick(id: number, status: string) {
@@ -75,9 +60,6 @@ export default function Taskbox({
       id,
       status: status == "completed" ? "pending" : "completed",
     });
-  }
-  function UpdateTask(){
-     updatemutate.mutate({id,title,description})
   }
   function handleDeleteTask(id: number) {
     deletemutate.mutate(id);
@@ -115,7 +97,6 @@ export default function Taskbox({
                   ☑
                 </button>
 
-                {isbuttontrue && <button onClick={()=>{UpdateTask}}>Update</button>}
               </div>
 
               <div

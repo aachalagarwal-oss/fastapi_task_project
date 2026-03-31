@@ -85,10 +85,10 @@ async def get_tasks(id:int,user:user_dependency,db:Session=Depends(get_db)):
 
 
 @router.put('/{id}')
-async def update(id:int,user:user_dependency,request:schemas.task.create_tasks,db:Session=Depends(get_db)):
+async def update(id:int,user:user_dependency,request:schemas.task.UpdateTask,db:Session=Depends(get_db)):
     try:
         service=TaskService(db)
-        return service.update_task(id=id,user_id=user.id,title=request.title,description=request.description,status=request.status)
+        return service.update_task(id=id,user_id=user.id,request=request)
     except HTTPException:
         raise
     except Exception:

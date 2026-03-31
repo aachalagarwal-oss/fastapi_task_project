@@ -1,10 +1,11 @@
 "use client"
 
-import Inputfields from "@/components/inputfields";
+
 import { loginUser } from "@/services/api";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import InputBox from "./tasks/InputBox";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -30,13 +31,13 @@ export default function Home() {
   }
   return (
     <div>
-      <Inputfields
+      <InputBox
         labeltext="Username"
         inputtext="Enter your username"
         value={email}
         onInputChange={(val) => setEmail(val)}
       />
-      <Inputfields
+      <InputBox
         labeltext="password"
         inputtext="Enter your password"
         value={password}

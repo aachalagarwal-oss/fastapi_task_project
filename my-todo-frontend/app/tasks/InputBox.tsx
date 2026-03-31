@@ -6,14 +6,16 @@ type texttypes = {
   type?: string;
 };
 
-export default function Inputfields({
+
+const InputBox=({
   labeltext,
   inputtext,
   value,
   onInputChange,
   type
-}: texttypes) {
-  return (
+}: texttypes)=>{
+     return (
+
     <div className="">
       <label className="">{labeltext}</label>
       <input
@@ -25,3 +27,5 @@ export default function Inputfields({
     </div>
   );
 }
+
+export default InputBox;

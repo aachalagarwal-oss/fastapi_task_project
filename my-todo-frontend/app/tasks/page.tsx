@@ -1,12 +1,15 @@
 "use client"
-import Inputfields from "@/components/inputfields";
-import Taskbox from "@/components/taskbox";
-import { posttask } from "@/services/api";
-import { useMutation } from "@tanstack/react-query";
+import { posttask, updateanytask } from "@/services/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import UpdateTodoForm from "./UpdateTodoForm";
+import AddTodoForm from "./AddTodoform";
+import Taskbox from "./TaskBox";
 
 
 export default function Tasks() {
+  const queryClient=useQueryClient();
+    const [isEditing,setIsEditing]=useState<number | null>(null);
     const [title,setTitle]=useState("");
     const [desc,setDesc]=useState("");
 
@@ -15,6 +18,7 @@ export default function Tasks() {
             return posttask(title,desc)
         },
         onSuccess:(data)=>{
+            queryClient.invalidateQueries({queryKey: ["tasks"]})
             alert("Task added")
             console.log(data)
             
@@ -24,6 +28,31 @@ export default function Tasks() {
         }
 
     })
+
+
+    const updatemutate = useMutation({
+        mutationFn: ({
+          id,
+          title,
+          description,
+        }: {
+          id: number;
+          title: string;
+          description: string;
+        }) => {
+          return updateanytask(id, title, description);
+        },
+        onSuccess: () => {
+          queryClient.invalidateQueries({queryKey: ["tasks"]})
+          alert("Task updated");
+        },
+    });
+
+    const handleUpdateClick=()=>{
+      if(!isEditing) return ;
+      updatemutate.mutate({id:isEditing,title,description:desc})
+    }
+
     const handleClick=()=>{
         tasksMutation.mutate({title,desc})
     }
@@ -33,11 +62,12 @@ export default function Tasks() {
         <h3 className="text-3xl font-bold text-center mb-6"> Todo Manager</h3> 
       </div>
       <div>
-        <Inputfields labeltext="Title" inputtext="Enter your title" value={title} onInputChange={setTitle}/>
-        <Inputfields labeltext="Description" inputtext="Enter the description" value={desc} onInputChange={setDesc}/>
-        <button onClick={handleClick}  className="border-3  bg-blue-600 ">+ Add Todo</button>
+        {isEditing?(<UpdateTodoForm title={title} desc={desc} id={isEditing} setTitleChanged={setTitle} setDescChanged={setDesc}/>):(<AddTodoForm title={title} desc={desc} setTitleChanged={setTitle} setDescChanged={setDesc}/>)}
+
+        {isEditing? <button onClick={handleUpdateClick}  className="border-3  bg-blue-800 ">+ Update Todo</button>:<button onClick={handleClick}  className="border-3  bg-blue-600 ">+ Add Todo</button>}
+        
       </div>
-     <Taskbox setTitleChanged={setTitle} setDescChanged={setDesc}/>
+     <Taskbox setTitleChanged={setTitle} setDescChanged={setDesc} setId={setIsEditing}/>
     </div>
   );
 }
